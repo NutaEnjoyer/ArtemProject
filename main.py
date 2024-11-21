@@ -31,6 +31,16 @@ class MailForm(StatesGroup):
 # Хендлер для обработки текстовых сообщений
 @dp.message(Command('start'))
 async def echo_handler(message: Message):
+    spl = message.text.split()
+    if len(spl) == 2:
+        cmd = spl[1]
+        print(cmd)
+        tariff_index = int(config.TARIFF_NAMES.index(cmd.lower()))
+
+        await message.answer_photo(config.PHOTO_URL, caption=config.tariff_text(config.TARIFFS[tariff_index]), reply_markup=config.tariff_keyboard(tariff_index))
+
+        return
+
     user = User.get_or_none(user_id=message.from_user.id)
     if not user:
         user = User.create(user_id=message.from_user.id)
@@ -40,6 +50,7 @@ async def echo_handler(message: Message):
 
 @dp.message(Command('stat'))
 async def stat_handler(message: Message):
+
     if message.from_user.id in config.ADMINS_ID:
         await message.answer(config.STAT_TEXT())
 
